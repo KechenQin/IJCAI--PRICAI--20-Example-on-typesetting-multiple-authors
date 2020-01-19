@@ -4,6 +4,13 @@
 Reading comprehension (RC) tasks have gained lots of attention from NLP research community during the past few years.  Two types of RC tasks are widely studied: the extractive question answering task \cite{DBLP:conf/emnlp/RajpurkarZLL16,DBLP:conf/acl/RajpurkarJL18}, and the  multiple-choice question answering task \cite{DBLP:conf/aaai/AydinYLLGD14,DBLP:conf/aaai/KhashabiKSR18}. Most of the current state-of-the-art methods use deep neural networks (DNN) based structures to tackle these two tasks and achieve practical performance on a variety of RC datasets. The most recent DNN based model BERT \cite{DBLP:journals/corr/abs-1810-04805} has even outperformed human's performance on the SQuAD dataset \cite{DBLP:conf/emnlp/RajpurkarZLL16}.%Currently, most of the existing RC models are deep neural network based models,which generate/extract the answers by taking the given questions and documents as their inputs directly.
 
 %In light of these concerns, most efforts to solve text comprehension task have focused on generating the correct answer, but ignored to explain the reasoning process... Therefore, we define reasoning in the following way:...
+
+
+All these deep learning models are either deep structures without internal steps, or with internal steps that do not justify comprehension. In other words, these models generate answers directly without giving human-understandable reasoning of the answer. %These models are not fully interpretable as the models are capsuled as black-boxes with only their inputs and outputs observable. It is not very likely to extract any extra logic reasoning by analyzing the coefficients or the structures of the neural networks. 
+Another disadvantage of the end-to-end DNN models is that the model is only valid for a specific domain of the training data, that is, the knowledge is not transferable to datasets in other domains. %Also, the knowledge are not explainable or interpretable as reasoning (by users). 
+By contrast, humans can answer questions following reasoning steps which are reproducible and transferable.  
+% , and the learned logic is transferable to other domains/tasks with very little adaptation effort. Therefore the current models are still quite different from the ``real human intelligence".
+
 \begin{figure}[t]
 	{\fontsize{9}{10}\selectfont
     \setlength{\tabcolsep}{0.6mm}
@@ -23,13 +30,6 @@ Reading comprehension (RC) tasks have gained lots of attention from NLP research
 \label{fig:qa_example}
 \vspace{-3ex}
 \end{figure}
-
-All these deep learning models are either deep structures without internal steps, or with internal steps that do not justify comprehension. In other words, these models generate answers directly without giving human-understandable reasoning of the answer. %These models are not fully interpretable as the models are capsuled as black-boxes with only their inputs and outputs observable. It is not very likely to extract any extra logic reasoning by analyzing the coefficients or the structures of the neural networks. 
-Another disadvantage of the end-to-end DNN models is that the model is only valid for a specific domain of the training data, that is, the knowledge is not transferable to datasets in other domains. %Also, the knowledge are not explainable or interpretable as reasoning (by users). 
-By contrast, humans can answer questions following reasoning steps which are reproducible and transferable.  
-% , and the learned logic is transferable to other domains/tasks with very little adaptation effort. Therefore the current models are still quite different from the ``real human intelligence".
-
-
 % \kechen{add a sentence for RL related work: RL nowadays can be used to analyze latent structure...?}
 To address these issues, we introduce a novel deep reasoning model for RC tasks, by taking advantage of the discourse information in the context. The model design is inspired by the reading behavior of a well trained reader (``mature reader"). A human reader would not search for the answer by simply reading the entire document without any focus. Instead he will look for the answer based on question topics and discourse markers ( \emph{e.g.} ``however" and ``because")~\cite{assiri2011test,sungatullina2016metacognitive}. Question topics and discourse markers can help the reader quickly select the most relevant segments (pieces of text) to read, and skip those less relevant ones. Figure \ref{fig:qa_example} gives an example on how a ``mature reader" finds an answer to a given question in a context paragraph. First, by reading the question, the reader notices the topic word ``reheating" and the question type ``when-". Then the reader searches for words that indicate \emph{time} from the given context, which could be ``after" or ``until". By analyzing the relationship between these time indicators and the target word ``reheating", the reader focuses on the context after ``until". Next, the reader splits the current focus by the connective ``as well as" into two clauses, which are complementary to each other. Finally, the reader picks the text segment between ``until" and ``as well as" as the final answer.
 

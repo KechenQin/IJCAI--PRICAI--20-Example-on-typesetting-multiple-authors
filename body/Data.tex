@@ -1,0 +1,49 @@
+\section{Experiments and Data}
+% \subsection{Data Description}
+%\kechen{highlight importance of using discourse marker, one sentence may contain more than one answer candidate, which makes NN model hard to distinguish.}
+\textbf{Discourse Markers Lexicon.}
+%In Rhetorical Structure Theory (RST) discourse framework \cite{mann1988rhetorical}, the text is segmented into a sequence of non-overlapping fragments called elementary discourse units (EDUs), and discourse relations connect neighboring units. Both EDUs and discourse relations, encoding the useful information about syntactic and semantic pragmatic properties, play important roles in understanding the context structure and extracting answers given a query \cite{DBLP:conf/clin/Bosma04,bosma2005extending,DBLP:journals/tal/VerberneBCO06,DBLP:conf/acl/JansenSC14,DBLP:conf/acl/NarasimhanB15}. Because discourse analysis is notoriously difficult, existing work seeks to utilize discourse markers to determine discourse relations, and thus identify the EDUs \cite{adequacyusing,sporleder2007exploiting,}. In this work, discourse markers guide the model to distinguish the answer-relevant text segments or EDUs from the context. \kechen{rewrite}
+To build a lexicon of English discourse markers, we collect connectives from Penn Discourse Treebank 2.0 (PDTB2.0) \cite{DBLP:conf/lrec/PrasadDLMRJW08} and \cite{marcu1998rhetorical}'s list of cue phrases. Inspired by a recent work \cite{DBLP:conf/sigdial/DasSBS18}, we add to our list additional words from RST Signalling Corpus \cite{das2014rst}, DiMLex-Eng corpus \cite{DBLP:conf/sigdial/DasSBS18}, and \cite{DBLP:journals/ijsc/BiranR11}'s relational indicators. After filtering out discourse markers with low frequencies in our corpora, we get a list of 207 discourse markers. Table \ref{tab:discourse_markers} shows sample discourse markers with their senses\footnote{Although in most of the cases the discourse markers can separate arguments with different meanings, some of the discourse markers such as ``although'' and ``if'' can precede both arguments, \textit{e.g.``although her friends like ice cream, she prefers yogurt''.} To deal with these cases, we add ``,'' into our sets of discourse markers to help.}. 
+\begin{table}[t]
+\centering
+{
+	\fontsize{8}{9}\selectfont
+    %\setlength{\baselineskip}{0pt}
+    \setlength{\tabcolsep}{1.0mm}
+    \renewcommand{\arraystretch}{1.1}
+	%\hspace{4mm}
+	\begin{tabular}{|c|c|}
+ 	\hline
+  	\textbf{Sense} & \textbf{Sample discourse markers} \\
+  	\hline
+ 	concession& although, though, but, if, however   \\
+    \hline
+ 	conjunction& and, then, or, while, also \\
+ 	\hline
+ 	cause & because, because of, as, since, as a result  \\
+ 	\hline
+ 	asynchronous& before, when, previously, until,after \\
+ 	\hline
+ 	restatement& rather, in turn, particularly, in particular, indeed   \\
+ \hline
+\end{tabular}
+}
+\caption{\fontsize{10}{12}\selectfont Sample discourse markers and their senses.}
+\label{tab:discourse_markers}
+\vspace{-2ex}
+\end{table}
+
+\textbf{RC Corpora.}
+There are many QA datasets (\textit{e.g.} SQuAD \cite{DBLP:conf/emnlp/RajpurkarZLL16,DBLP:conf/acl/RajpurkarJL18} and CNN/Daily
+News \cite{DBLP:conf/nips/HermannKGEKSB15}) available for reading comprehension tasks. Most of the documents in these datasets, however, don't contain dense discourse markers, thus they are not suitable to test our model's performance. 
+%Although deep neural networks perform well on these datasets, they fail to explain long path reasoning. 
+To demonstrate our model, we focus on Question-Answer meaning representations datasets \cite{DBLP:conf/naacl/MichaelSHDZ18}: the QAMR corpus and the PTB corpus. Both of them contain relative short-document context but with complex logic reasoning steps. Specifically, the Wall Street Journal (WSJ) documents in PTB corpus are widely used in discourse studies. We restrict our discussion to shorter documents by filtering out documents without discourse markers and those with more than 10 discourse markers; this is because an excessive number of discourse markers in long document tends to give redundant reasoning steps. Binary searching by discourse markers in such long documents is not necessarily how human read and interpret long expositions, so our method is less applicable.
+% , which is also kind of different from a normal human's reading behavior. Removing such samples can also helps us reduce the total training time.
+%This study uses two corpora from Question-Answer Meaning Representations datasets \cite{DBLP:conf/naacl/MichaelSHDZ18}: the QAMR corpus and the PTB corpus. They contain QA pairs extracted from Wikipedia and Penn Treebank \cite{DBLP:journals/coling/MarcusSM94}.
+%The QAMR corpus consists of 69,320 QA pairs for 4,238 context paragraphs extracted from Wikipedia, and the PTB corpus consists of 27,082 QA pairs for 253 context paragraphs extracted from Penn Treebank \cite{DBLP:journals/coling/MarcusSM94}.
+There is one target word in each question representing the question topic associated with each QA pair. %We treat a QA pair and its context paragraph as one data sample. 
+When the answer spreads across two text segments, we treat the discourse segment containing more than 50\% answer tokens as the answer segment.
+%We assume that the answer cannot spread across two text segments, and remove those counter-cases (Only 8\% QA pairs are counter-cases.), so each context only contains one segment 
+% enclosed by discourse markers containing the ground truth answer. 
+After pre-processing, 5\% QA pairs are filtered out from the original dataset, and the two corpora in our experiments are referred as \textsc{QAMR-SUBSET} and \textsc{PTB-SUBSET}.
+% These two datasets are suitable to our reading comprehension experiments and transferable experiments, as they contain a variety of questions that are from different sources.

@@ -1,0 +1,52 @@
+\section{Introduction}
+% \kechen{We need a better definition of reasoning and highlight it. maybe we need to highlight our contribution on designing this RL framework, because some reviewer only think our work as an application of RL and they did not appreciate our setup. More RL related work. This is for both background and motivation of RL.}
+
+Reading comprehension (RC) tasks have gained lots of attention from NLP research community during the past few years.  Two types of RC tasks are widely studied: the extractive question answering task \cite{DBLP:conf/emnlp/RajpurkarZLL16,DBLP:conf/acl/RajpurkarJL18}, and the  multiple-choice question answering task \cite{DBLP:conf/aaai/AydinYLLGD14,DBLP:conf/aaai/KhashabiKSR18}. Most of the current state-of-the-art methods use deep neural networks (DNN) based structures to tackle these two tasks and achieve practical performance on a variety of RC datasets. The most recent DNN based model BERT \cite{DBLP:journals/corr/abs-1810-04805} has even outperformed human's performance on the SQuAD dataset \cite{DBLP:conf/emnlp/RajpurkarZLL16}.%Currently, most of the existing RC models are deep neural network based models,which generate/extract the answers by taking the given questions and documents as their inputs directly.
+
+%In light of these concerns, most efforts to solve text comprehension task have focused on generating the correct answer, but ignored to explain the reasoning process... Therefore, we define reasoning in the following way:...
+\begin{figure}[t]
+	{\fontsize{9}{10}\selectfont
+    \setlength{\tabcolsep}{0.6mm}
+%    \hspace{-2mm}
+    \begin{tabular}{|p{75mm}|}
+    \hline
+\textbf{Context: }\textit{\textcolor{red}{After}} inflation stopped, \textit{\textcolor{blue}{reheating }}occurred \textit{\textcolor{red}{until}} the universe obtained the temperatures required for the production of a quark-gluon plasma \textit{\textcolor{red}{as well as}} all other elementary particles. \\
+\textbf{Question: }When did \textit{\textcolor{blue}{reheating}} stop?     \\
+\textcolor{gray}{(reasoning step 1: focus on the context to the right of ``until")}\\
+\textbf{Context: }the universe obtained the temperatures required for the production of a quark-gluon plasma \textit{\textcolor{red}{as well as}} all other elementary particles. \\
+\textcolor{gray}{(reasoning step 2: focus on the context to the left of ``as well as")}\\
+\textbf{Answer: }until the universe obtained the temperatures required for the production of a quark-gluon plasma \\
+\hline
+    \end{tabular}
+    }
+\caption{An Example in QAMR: The words in italics are discourse markers (in red) and question topic words (in blue). Reasoning steps are highlighted in gray. }
+\label{fig:qa_example}
+\vspace{-3ex}
+\end{figure}
+
+All these deep learning models are either deep structures without internal steps, or with internal steps that do not justify comprehension. In other words, these models generate answers directly without giving human-understandable reasoning of the answer. %These models are not fully interpretable as the models are capsuled as black-boxes with only their inputs and outputs observable. It is not very likely to extract any extra logic reasoning by analyzing the coefficients or the structures of the neural networks. 
+Another disadvantage of the end-to-end DNN models is that the model is only valid for a specific domain of the training data, that is, the knowledge is not transferable to datasets in other domains. %Also, the knowledge are not explainable or interpretable as reasoning (by users). 
+By contrast, humans can answer questions following reasoning steps which are reproducible and transferable.  
+% , and the learned logic is transferable to other domains/tasks with very little adaptation effort. Therefore the current models are still quite different from the ``real human intelligence".
+
+
+% \kechen{add a sentence for RL related work: RL nowadays can be used to analyze latent structure...?}
+To address these issues, we introduce a novel deep reasoning model for RC tasks, by taking advantage of the discourse information in the context. The model design is inspired by the reading behavior of a well trained reader (``mature reader"). A human reader would not search for the answer by simply reading the entire document without any focus. Instead he will look for the answer based on question topics and discourse markers ( \emph{e.g.} ``however" and ``because")~\cite{assiri2011test,sungatullina2016metacognitive}. Question topics and discourse markers can help the reader quickly select the most relevant segments (pieces of text) to read, and skip those less relevant ones. Figure \ref{fig:qa_example} gives an example on how a ``mature reader" finds an answer to a given question in a context paragraph. First, by reading the question, the reader notices the topic word ``reheating" and the question type ``when-". Then the reader searches for words that indicate \emph{time} from the given context, which could be ``after" or ``until". By analyzing the relationship between these time indicators and the target word ``reheating", the reader focuses on the context after ``until". Next, the reader splits the current focus by the connective ``as well as" into two clauses, which are complementary to each other. Finally, the reader picks the text segment between ``until" and ``as well as" as the final answer.
+
+%We observe a human reasoning behavior as a \kechen{multiple steps procedure to search for the correct answer based on the word marks in mind from the context related to the question}. This reasoning process can be guided by the question type first, then search the answer directed by the question topic.
+
+
+
+%The context is divided into 4 sub-segments by the discourse markers highlighted in red. \kechen{add explanation}
+
+
+In this paper, we design a reinforcement learning based multi-step reasoning model to mimic the reading process of a ``mature reader". Our work focuses on short document with extractable discourse information, which means the context only contains a few sentences and a reasonable number of discourse markers. With this assumption, we can better interpret and evaluate our learned reasoning steps. %These reasoning steps are learned by analyzing the searching sequence among the text segments split by the discourse markers. 
+%To the best of our knowledge, this is the first interpretable multi-step system capable of learning the reasoning steps. %Our model does not only generate accurate answers, but also has an interpretable decision process that shows how the answers are produced. 
+We test our model on two different types of tasks: an extractive question answering task on the Question-Answer Meaning Representations dataset (QAMRs) \cite{DBLP:conf/naacl/MichaelSHDZ18}; and an argument mining task \cite{DBLP:conf/lrec/ReedPRM08}  on the persuasive essay dataset \cite{DBLP:conf/coling/StabG14}. The experimental results show that with the help of discourse information, our model can learn a human-like reasoning ability, which is generally applicable and transferable across domains.
+%Our deep reasoning model is designed to capture high-level information about context structures, and we demonstrate this by showing good domain transferability between different datasets and different tasks.
+%Discourse markers such as ``however" and ``because" express discourse structure and can guide our model to search for the answers. The reasoning steps are learned by analyzing the searching sequence among the text segments split by the discourse markers. %are guided by the reading sequence of the text segments divided by these discourse markers\kechen{clear?}. %In the proposed model, a deep reinforcement learning based structure is designed to learn the internal logic reasoning (mainly deductive reasoning) steps by stochastically searching the next best text segment divided by the discourse makers sequentially. 
+%We conduct experiments and show that with the help of discourse information, our model can learn a human-like reasoning ability, which is generally applicable to different domains and is transferable across domains.  %With the help of question topic and discourse connectives, it enhances 
+% and transfer its learned knowledge from one domain to the other. We prove these hypotheses using experiments on different datasets.
+%\kechen{change this paragraph by further explaining reasoning step and discourse markers?}
+%Our model outperforms all other methods, and provides human-understandable reasoning steps. Moreover
+%The rest of the paper is structured as follows: we first summarize related work in Section... 

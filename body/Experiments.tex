@@ -1,0 +1,233 @@
+
+\textbf{Experimental Setup.}
+ For all experiments we use 10\% training samples as the development set, and tune the parameters on it.
+We implement our deep reasoning model (DRM) using \textsc{tensorflow-1.4.0} and \textsc{Keras-2.0.8}. To implement CNNs, we use rectified linear units (relu) as activation functions and 300 convolutional filters with windows size of 2. We train the model with Adam optimizer with start learning rate $0.001$. We adopt \emph{accuracy} as our main evaluation metric, which measures how many selected text spans contain the answer out of all. The following  methods are compared:\\
+% \begin{itemize}
+% \vspace{-1mm}
+% \setlength\itemsep{-0.8mm}
+$\bullet$ \textbf{DRM-type 1} and \textbf{DRM-type 2} Our deep reasoning models with type 1 /type 2 action. \\
+% $\bullet$  \textbf{DRM-type 2} Our deep reasoning model with type 2 action, as described in Section \ref{sec:design}. \\
+$\bullet$  \textbf{DRM-type 2 w/ human} We consider a variant of our deep reasoning model with human in the loop, in order to demonstrate that our model has the ability to interact with humans. At each decision step, if the algorithm's confidence in its best action is lower than a pre-specified threshold $T_r=0.6$, the algorithm asks a human to pick an action from the $2\times k$ actions. We assume that humans always make the right decision w.r.t. the ground truth.  \\
+$\bullet$  \textbf{DRM-noRL} We test our model structure (see Figure \ref{fig:sgmDiagram}) with multi-class classification loss. Each segment is assigned a score, and the segment with the highest score is predicted. \\
+ $\bullet$  \textbf{Gradient Boosting}. 
+ % A  binary classifier to evaluate different (question, context segment) pairs and select the segment with the highest prediction score. corollary
+% Bag-of-words features are first extracted separately from both the question and the segment and then concatenated. We choose Gradient Boosting due to its effectiveness in modeling feature interactions;
+Two variants of Gradient Boosting are tested, one trained with binary cross entropy loss, and the other with ranking loss. In addition to bag-of-words features, for fairness we introduce four new discourse features: left and right discourse markers, the position of the target word, the first word of the question.\\
+$\bullet$  \textbf{BM25} We use BM25~\cite{DBLP:journals/ftir/RobertsonZ09} as a bag-of-words retrieval function to rank segments based on the question terms. \\
+%$\bullet$  \textbf{Chunked BoW Model}~\cite{DBLP:conf/acl/ChoiHUPLB17}. This is similar to the Gradient Boosting-binary model, except that the binary classifier employed is a neural network with fully connected layers. \\
+$\bullet$  \textbf{Coarse-to-Fine Answer Selector}~\cite{DBLP:conf/acl/ChoiHUPLB17} concatenates the context and the question, and run a neural network on it to select the relevant text span. We adopt their Chunked BoW setup.\\
+$\bullet$  \textbf{RaSoR}~\cite{DBLP:journals/corr/LeeKP016} builds a deep neural network model to select a span of text as the answer. Each candidate span is fixed-length representated using BiLSTM and neural co-attention. 
+% \end{itemize}
+
+\subsection{Experimental Results}
+%0. RL learning curve\\
+\begin{table*}[ht]
+
+	\begin{center}
+	\resizebox{1.95\columnwidth}{!}{%resize the table
+		\begin{tabular}{|l|c|c|c|c|cccccccc|}
+			\hline
+       \textbf{Method} & \textbf{Loss} & \textbf{Discourse} & \textbf{Target Word} 
+      & \textbf{All} & \textbf{What} & \textbf{Whose} & \textbf{How} & \textbf{Why} & \textbf{Where} & \textbf{Who} & \textbf{When} & \textbf{Which} \\
+
+            \hline
+      Gradient Boosting & binary & &
+      & .488 & .485 & .523 & .502 & .461 & .477 & .471 & .517 & .561 \\
+      Gradient Boosting & binary & \checkmark &\checkmark 
+      & .673 & .676 & .633 & .664 & .538 & .659 & .662 & .721 & .684 \\
+            Gradient Boosting & ranking & & 
+      & .469 & .486 & .397 & .414 & .566 & .475 & .447 & .453 & .457 \\
+      Gradient Boosting & ranking & \checkmark &\checkmark 
+      & .670 & .673 & .638 & .657 & .538 & .657 & .662 & .721 & .684 \\
+      BM25 & ranking & &
+      & .536 & .545 & .679 & .543 & .160 & .529 & .510 & .464 & .594 \\
+
+      Coarse-to-Fine Answer Selector & binary & &
+      & .540 & .539 & .490 & .506 & \textbf{.615} & .524 & .552 & .571 & .558 \\
+     % CNN & binary & &
+     % & .511 & .508 & .528 & .515 & .564 & .496 & .513 & .517 & .522 \\
+      RaSoR & multi-class & &
+      & .615 & .620 & \textbf{.706} & .598 & .560 & .599 & .598 & .586 & .659 \\
+      \hline
+      DRM-noRL & binary & \checkmark & \checkmark 
+       & .664 & .667 & .619 & .649 & .564 & .653 & .657 & .706 & .678 \\
+      DRM-type 1 & RL & \checkmark & 
+      & .691 & .696 & .676 & .681 & \textbf{.615} & .696 & .671 & .724 & .702 \\
+      DRM-type 2 & RL & \checkmark & \checkmark 
+      & \textbf{.702}  & \textbf{.703} & .676 & \textbf{.684} & \textbf{.615} & \textbf{.701} & \textbf{.677} & \textbf{.733} & \textbf{.705} \\
+      DRM-type 2 w/ human & RL & \checkmark & \checkmark 
+      & \textbf{.797} & \textbf{.801} & \textbf{.789} & \textbf{.769} & \textbf{.820} & \textbf{.778} & \textbf{.793} & \textbf{.815} & \textbf{.810} \\
+      \hline
+
+		\end{tabular}
+
+				}\vspace{0.4mm}	\\
+\small{Table 3(a): Results on QAMR-SUBSET dataset.}\\\vspace{2mm}
+	\resizebox{1.95\columnwidth}{!}{%resize the table
+		\begin{tabular}{|l|c|c|c|c|cccccccc|}
+			\hline
+       \textbf{Method} & \textbf{Loss} & \textbf{Discourse} & \textbf{Target Word} 
+      & \textbf{All} & \textbf{What} & \textbf{Whose} & \textbf{How} & \textbf{Why} & \textbf{Where} & \textbf{Who} & \textbf{When} & \textbf{Which} \\
+
+            \hline
+      Gradient Boosting & binary & &
+      & .338 & .355 & .363 & .289 & .166 & .291 & .311 & .263 & .428 \\
+      Gradient Boosting & binary & \checkmark &\checkmark 
+      & .575 & .586 & .528 & \textbf{.616} & .666 & .632 & \textbf{.621} & \textbf{.610} & \textbf{.528} \\
+            Gradient Boosting & ranking & & 
+      & .360 & .376 & .454 & .339 & .666 & .354 & .335 & .276 & .301 \\
+      Gradient Boosting & ranking & \checkmark &\checkmark 
+      & .561 & .567 & .424 & .578 & .166 & .583 & .566 & .539 & .507 \\
+      BM25 & ranking & &
+      & .456 & .481 & .380 & .393 & .0.0 & .448 & .439 & .444 & .491 \\
+
+      Coarse-to-Fine Answer Selector & binary & &
+      & .405 & .422 & .363 & .408 & .166 & .312 & .376 & .315 & .492 \\
+      %CNN & binary & &
+      %& .356 & .346 & .242 & .359 & .666 & .437 & .376 & .355 & .365 \\
+      RaSoR & multi-class & &
+      & .539 & .545 & \textbf{.619} & .525 & .375 & .528 & .552 & .487 & .491 \\
+      \hline
+      DRM-noRL & binary & \checkmark & \checkmark 
+       & .573 & .571 & .606 & .591 & .833 & \textbf{.645} & .572 & .513 & .539 \\
+      DRM-type 1 & RL & \checkmark & 
+      & .569 & .579 & .515 & .572 & \textbf{.833} & .625 & .560 & .513 & .492 \\
+      DRM-type 2 & RL & \checkmark & \checkmark 
+      & \textbf{.599} & \textbf{.599} & .575 & \textbf{.616} & \textbf{.833} & \textbf{.666} & .598 & .565 & .523 \\
+      DRM-type 2 w/ human & RL & \checkmark & \checkmark 
+      & \textbf{.676} & \textbf{.676} & \textbf{.727} & \textbf{.683} & \textbf{1.0} & .500 & \textbf{.698} & \textbf{.618} & \textbf{.682} \\
+      \hline
+    
+		\end{tabular}
+
+		}\vspace{0.4mm}	\\
+\small{Table 3(b): Results on PTB-SUBSET dataset.}\\\vspace{2mm}
+		
+	\resizebox{1.95\columnwidth}{!}{%resize the table
+		\begin{tabular}{|l|c|c|c|c|cccccccc|}
+			\hline
+       \textbf{Method} & \textbf{Loss} & \textbf{Discourse} & \textbf{Target Word} 
+      & \textbf{All} & \textbf{What} & \textbf{Whose} & \textbf{How} & \textbf{Why} & \textbf{Where} & \textbf{Who} & \textbf{When} & \textbf{Which} \\
+
+        \hline
+      Gradient Boosting & binary & &
+      & .224 & .231 & .303 & .150 & .500 & .458 & .210 & .197 & .158 \\
+      Gradient Boosting & binary & \checkmark &\checkmark 
+      & .352 & .346 & .393 & .379 & .500 & .361 & .329 & .394 & .400 \\
+      Coarse-to-Fine Answer Selector & binary & &
+      & .367  & .369 & .272 & .402 & .333 & .250 & .358 & .473 & .317 \\
+      RaSoR & multi-class & &
+      & .590 & \textbf{.610} & \textbf{.714} & .512 & .500 & .586 & .547 & \textbf{.581} & \textbf{.711} \\
+      DRM-type 2 & RL & \checkmark & \checkmark 
+      & \textbf{.596} & .601 & .515 & \textbf{.616} & \textbf{.833} & \textbf{.625} & \textbf{.592} & .565 & .507 \\
+     % DRM-type 2\_ptb
+     % & .599 & .599 & .575 & .616 & .833 & .666 & .598 & .565 & .523 \\
+      \hline
+
+		\end{tabular}
+
+		}\vspace{0.4mm}			\\
+\small{Table 3(c): Transfer test results on PTB-SUBSET dataset.}\\\vspace{2mm}
+	\end{center}
+	\caption{Comparison of different approaches. We show the training loss (binary: binary cross entropy loss, ranking: ranking loss, multi-class: cross entropy loss, RL: reinforcement learning loss in formula \ref{rlloss}.), and check whether discourse or target word is used in each method. We highlight the top scores of each column in bold. 
+  }\label{tab:main}
+  \vspace{-3ex}
+\end{table*}
+
+
+
+We report the overall segment prediction accuracy on the datasets and the accuracy on each question type (Table~\ref{tab:main}). On both QAMR dataset and PTB dataset, DRM-type 2 with human in the loop achieves the highest accuracy. Being able to interact with humans is an advantage of our approach; 
+% Humans can understand the decision process of the algorithm and can intervene if necessary. By contrast, 
+none of the competitor approaches can do this, either because their decision process is a single-step process or because their decision process is not interpretable. In our experiment, 65\% QA pairs (less than the threshold) get help from human at one reasoning step, and their performance increases 0.15. It is also very interesting to learn that the remaining 35\% data points with high confidence reasoning learned by our model perform 0.06 better than the average performance. To further understand whether the improvement comes from human's selection or from our model's judgement, we allow the model to randomly select 65\% of the QA pairs, and for each pair, to interact with human once without considering their confidence. The results show that such random selection procedure doesn't make any difference on performance. Even without human's help, our DRM-type 2 model still achieves better performance than all other methods. As expected, DRM-type 2 model performs better than DRM-type 1 model, since type 2 actions leverage more information. 
+%Looking at how the algorithm performs as the number of reasoning steps increases, the prediction accuracy increases slightly as the reasoning gets longer: the accuracy for 1-step, 2-step, 3-step and 4-step reasoning is 0.700,0.700,0.705 and 0.727.
+
+Among the baseline methods, Gradient Boosting trained on both bag-of-words + discourse features works best. These models perform much worse if trained only on bag-of-words features. This shows that the structure/order information captured by discourse features is essential, which Neural network doesn't do. 
+% The classical BM25 works well on questions that start with ``whose" but terribly on questions that start with ``why". 
+Since BM25 solely relies on similarity between the question and the segment, it only works well when the the question and the correct segment have many overlapping words, as in the case of ``whose" questions, but not ``why" questions.
+
+We also study whether the learned reasoning model is transferable by training DRM on the QAMR dataset but test the learned model on PTB dataset. Results in Table~\ref{tab:main} show that this model generalizes well on PTB dataset -- its performance is very close to the DRM model trained on PTB directly. We also observe that the RaSoR model achieves a very good performance. We think this is because training a deep neural network model benefits from the larger number of training samples in QAMR-SUBSET dataset. 
+
+
+\subsection{Comparison with QA Methods}
+In this section, we compare our model with several other benchmark QA models on the QAMR-SUBSET and PTB-SUBSET datasets. The results are shown in Table~\ref{tab:nnresults}. 
+\begin{table}[h]
+	\resizebox{1.01\columnwidth}{!}{%resize the table
+\begin{tabular}{|l|c|c|}
+  \hline
+  \textsc{Model} & \textsc{QAMR-SUBSET} & \textsc{PTB-SUBSET}   \\
+  \hline
+  MemNets & .476 & .423 \\
+  GA-Reader (fix $L(w)$) & .610 & .532 \\
+  QANet & .703 & .602   \\
+  Mnemonic Reader & .700 & .595 \\
+  DRM-type 2 & .702 & .599   \\
+  \hline
+\end{tabular}
+}
+\caption{\fontsize{10}{12}\selectfont  Our model vs. popular QA models.}\label{tab:nnresults}
+  \vspace{-3ex}
+\end{table}
+Most of these approaches are originally designed to extract the exact answer(s) from the context. In order to modify these models' outputs as a segment, we change the training target from the exact answer to an answer segment. We observe that QANet gives the best accuracy in terms of selecting the correct text span containing the answer. 
+% All these methods except QANet can be considered as multi-step reasoning models, and our model gives the best performance among all these models.
+% 1. discourse is better than no discourse in Gradient Boosting and Gradient Boostingrank
+% 2. bm25 model similarity, perform not very well e.g. 'The victory comes (after) a few days (because)blabla' What comes a few days after?
+% 3. bow and cnn can't explicitly model discourse info, so perform not very well
+% 4. compare two setups? binary classifier vs. pairwise ranking
+% 3. drmtype2 perform better than drmtype1 as we expected
+% 4. introduce how human-in-the-loop work
+% 5. 
+% 6. compare drm-transfer and drm-ptb: why better than ptb why because ptd does not contain many why question.
+
+
+%Because the deep reasoning model appear to capture high-level information about context structures, we hypothesize that the models should perform very well even when training on data from different domains. http://www.aclweb.org/anthology/P14-1092
+
+
+\begin{table*}[t]
+\centering
+{
+	\fontsize{9}{9}\selectfont
+  %\setlength{\baselineskip}{0pt}
+  \setlength{\tabcolsep}{1.0mm}
+  \renewcommand{\arraystretch}{1.1}
+	%\hspace{4mm}
+	\begin{tabular}{|p{1.8cm}|p{2.5cm}|p{2.5cm}|p{2.5cm}|p{5.8cm}|}
+ 	\hline
+ 	\textbf{Question genre}  & \textbf{Same side}& \textbf{Opposite sides}& \textbf{Context-dependent (side)} &  \textbf{Example QA pairs} \\
+ 	\hline
+ 	when \newline what year \newline how long 
+ 	& \textbf{step 1}: already, again, still, following \newline\textbf{step 2}: while, yet & \textbf{step 1}: as soon as, at that \newline\newline \textbf{step 2}: then, further, originally
+ 	&\textbf{step 1}: previously, until, back, after, soon, during \newline \textbf{step 2}: since, second, next, when, as well, because, who 
+	&  \textbf{Context: }28 \textit{\textcolor{blue}{skiers}} earned DNFs \textit{\textcolor{red}{during}} \underline{the first run}, \textit{\textcolor{red}{and}} nine earned DNFs \textit{\textcolor{red}{during}} their second runs.
+  \newline \textbf{Question: }When did \textit{\textcolor{blue}{skiers}} earn DNFs? 
+  \newline \textbf{Learned Reasoning: } during-right, and-left\\ 
+	\hline
+  why \newline what caused 
+ &\textbf{step 1}: in order to, because, due to,  since \newline\textbf{step 2}: as, but &\textbf{step 1}: at that, previously, though, if, since \newline \textbf{step 2}: second, for, to, or, that, not, and & \textbf{step 1}: well, following, initially  \newline\newline\textbf{step 2}: which, even,certainly  
+  & \textbf{Context: }Given its initial condition, prediction of its final condition is possible, causally \textit{\textcolor{red}{but}} only probabilistically, \textit{\textcolor{red}{because}} the Schrödinger equation is deterministic for wave function evolution, \textit{\textcolor{red}{but}} \underline{the wave function describes the system only} \underline{\textit{\textcolor{blue}{probabilistically}}}.
+  \newline \textbf{Question: }Why is the prediction \textit{\textcolor{blue}{probabilistic}}?
+  \newline \textbf{Learned Reasoning: }because-right, but-right\\ 
+	\hline	
+	who+past tense 
+
+	& \textbf{step 1}: rather, thus, including \newline\newline\textbf{step 2}: nor, who, initially &\textbf{step 1}: earlier, definitely, previously \newline\newline\textbf{step 2}: particularly, seemingly
+		&\textbf{step 1}: ultimately, since, when, later, while, finally \newline \textbf{step 2}:  again, last, and , after, next, 
+	& \textbf{Context: }\underline{Hatch had} \textit{\textcolor{red}{previously}} \textit{\textcolor{blue}{survived}} a separate crash in 2003, \textit{\textcolor{red}{that}} killed his mother, brother \textit{\textcolor{red}{and}} sister.
+  \newline \textbf{Question: }Who \textit{\textcolor{blue}{survived}}?\newline \textbf{Learned Reasoning: }previously-left\\ 
+	\hline
+  where 
+ 
+  
+	 &\textbf{step 1}: following, to explain, while \newline\newline\textbf{step 2}: possibly, initially, finally, hence &\textbf{step 1}: to, before, back, in that, eventually \newline\textbf{step 2}: like, or, as & \textbf{step 1}: in which, then, second, next \newline\newline \textbf{step 2}: too, yet, second, including, after, next
+  & \textbf{Context: }\textit{\textcolor{red}{Once}} the proposed \textit{\textcolor{blue}{amendment}} has passed those hurdles, \textit{\textcolor{red}{then}} the amendment goes \textit{\textcolor{red}{to}} \underline{Indiana voters} \textit{\textcolor{red}{who}} vote yea or nay on the amendment. 
+  \newline \textbf{Question: }Where does the \textit{\textcolor{blue}{amendment}} go?
+  \newline \textbf{Learned Reasoning: }to-right, who-left\\ 
+ \hline
+\end{tabular}
+}
+\caption{\fontsize{9}{12}\selectfont Top discourse markers are associated with question genres, and focus direction is learned in \textsc{QAMR-SUBSET} dataset. We show four different question genres: time, reason, person, and location.}
+\label{tab:disc_phrase}
+\vspace{-3ex}
+\end{table*}
+
+Our method has an obvious advantage over the others: unlike the multi-step models where the number of steps need to be predefined, our model is capable of using a dynamic number of reasoning steps to resolve different QA pairs. Another very important difference is that the existing models achieve multi-step by updating the internal vector representations, which is not interpretable, while our model directly prunes the context for an interpretable reasoning process.
+

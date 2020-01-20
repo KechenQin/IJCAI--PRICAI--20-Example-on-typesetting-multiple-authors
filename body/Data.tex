@@ -157,7 +157,7 @@ There is one target word in each question representing the question topic associ
 When the answer spreads across two text segments, we treat the discourse segment containing more than 50\% answer tokens as the answer segment.
 %We assume that the answer cannot spread across two text segments, and remove those counter-cases (Only 8\% QA pairs are counter-cases.), so each context only contains one segment 
 % enclosed by discourse markers containing the ground truth answer. 
-5\% QA pairs are filtered out from the original dataset because they contain zero  or excessive number of discourse markers, and the two corpora in our experiments are referred as \textsc{QAMR-SUBSET} and \textsc{PTB-SUBSET}. The average number of segments and words per segment are 4.7/5.7 and 4.4/6.0 for each dataset.
+\kechen{5\% QA pairs are filtered out from the original dataset because they contain zero  or excessive number of discourse markers, and the two corpora in our experiments are referred as \textsc{QAMR-SUBSET} and \textsc{PTB-SUBSET}. The average number of segments and words per segment are 4.7/5.7 and 4.4/6.0 for each dataset.}
 % These two datasets are suitable to our reading comprehension experiments and transferable experiments, as they contain a variety of questions that are from different sources.
 
 %We restrict our discussion to shorter documents by filtering out documents without discourse markers and those with more than 10 discourse markers; this is because an excessive number of discourse markers in long document tends to give redundant reasoning steps. Binary searching by discourse markers in such long documents is not necessarily how human read and interpret long expositions, so our method is less applicable.

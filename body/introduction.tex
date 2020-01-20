@@ -1,28 +1,40 @@
 \section{Introduction}
 % \kechen{We need a better definition of reasoning and highlight it. maybe we need to highlight our contribution on designing this RL framework, because some reviewer only think our work as an application of RL and they did not appreciate our setup. More RL related work. This is for both background and motivation of RL.}
-
-Reading comprehension (RC) tasks have gained lots of attention from NLP research community during the past few years.  Two types of RC tasks are widely studied: the extractive question answering task \cite{DBLP:conf/emnlp/RajpurkarZLL16,DBLP:conf/acl/RajpurkarJL18}, and the  multiple-choice question answering task \cite{DBLP:conf/aaai/AydinYLLGD14,DBLP:conf/aaai/KhashabiKSR18}. Most of the current state-of-the-art methods use deep neural networks (DNN) based structures to tackle these two tasks and achieve practical performance on a variety of RC datasets. The most recent DNN based model BERT \cite{DBLP:journals/corr/abs-1810-04805} has even outperformed human's performance on the SQuAD dataset \cite{DBLP:conf/emnlp/RajpurkarZLL16}.%Currently, most of the existing RC models are deep neural network based models,which generate/extract the answers by taking the given questions and documents as their inputs directly.
+\kechen{is reading comprehension an appropriate word here}
+Reading comprehension (RC) tasks have gained lots of attention from NLP research community during the past few years.  %Two types of RC tasks are widely studied: the extractive question answering task, and the  multiple-choice question answering task. 
+Most of the current state-of-the-art methods use deep neural networks (DNN) based structures to tackle these tasks and achieve practical performance on a variety of RC datasets. The most recent DNN based model BERT \cite{DBLP:journals/corr/abs-1810-04805} has even outperformed human's performance on the SQuAD dataset \cite{DBLP:conf/emnlp/RajpurkarZLL16}.%Currently, most of the existing RC models are deep neural network based models,which generate/extract the answers by taking the given questions and documents as their inputs directly.
 
 %In light of these concerns, most efforts to solve text comprehension task have focused on generating the correct answer, but ignored to explain the reasoning process... Therefore, we define reasoning in the following way:...
 
 
-All these deep learning models are either deep structures without internal steps, or with internal steps that do not justify comprehension. In other words, these models generate answers directly without giving human-understandable reasoning of the answer. %These models are not fully interpretable as the models are capsuled as black-boxes with only their inputs and outputs observable. It is not very likely to extract any extra logic reasoning by analyzing the coefficients or the structures of the neural networks. 
+Previous work on reading comprehension is abundantly based on end-to-end deep learning (DNN) models. They are usually equipped with two key techniques: (1) a recurrent or convolutional structure to capture dependencies of the sequential input, and (2) an attention module to fusion information from context and query. All these deep learning models are either deep structures without internal steps \cite{DBLP:conf/iclr/SeoKFH17,DBLP:journals/corr/abs-1804-09541}, or with internal steps that do not justify comprehension \cite{DBLP:journals/corr/SordoniBB16,DBLP:conf/kdd/ShenHGC17,DBLP:conf/ijcai/HuPHQW018,DBLP:conf/acl/MinZZH19}. In other words, these models generate answers directly without giving human-understandable reasoning of the answer. %These models are not fully interpretable as the models are capsuled as black-boxes with only their inputs and outputs observable. It is not very likely to extract any extra logic reasoning by analyzing the coefficients or the structures of the neural networks. 
 Another disadvantage of the end-to-end DNN models is that the model is only valid for a specific domain of the training data, that is, the knowledge is not transferable to datasets in other domains. %Also, the knowledge are not explainable or interpretable as reasoning (by users). 
 By contrast, humans can answer questions following reasoning steps which are reproducible and transferable.  
 % , and the learned logic is transferable to other domains/tasks with very little adaptation effort. Therefore the current models are still quite different from the ``real human intelligence".
+
+%\textit{\textcolor{red}{On}} 15 May, \textit{\textcolor{blue}{Nur ad-Din}} died \textit{\textcolor{red}{after}} falling ill the previous week \textit{\textcolor{red}{and}} his \textit{\textcolor{blue}{power}} was handed \textit{\textcolor{red}{to}} his eleven-year-old son as-Salih Ismail al-Malik.
+
+%Who was his \textit{\textcolor{blue}{power}} handed to?
+%['his eleven-year-old son', 'his eleven-year-old son'] week
+%{(27, 32): 'after', (88, 90): 'to', (63, 66): 'and'}
+
+%When did \textit{\textcolor{blue}{Nur ad-Din}} fall ill?
+%['the previous week', 'the previous week'] Nur
+%{(27, 32): 'after', (88, 90): 'to', (63, 66): 'and'}
 
 \begin{figure}[t]
 	{\fontsize{9}{10}\selectfont
     \setlength{\tabcolsep}{0.6mm}
 %    \hspace{-2mm}
-    \begin{tabular}{|p{75mm}|}
+    \begin{tabular}{|p{83mm}|}
     \hline
-\textbf{Context: }\textit{\textcolor{red}{After}} inflation stopped, \textit{\textcolor{blue}{reheating }}occurred \textit{\textcolor{red}{until}} the universe obtained the temperatures required for the production of a quark-gluon plasma \textit{\textcolor{red}{as well as}} all other elementary particles. \\
-\textbf{Question: }When did \textit{\textcolor{blue}{reheating}} stop?     \\
-\textcolor{gray}{(reasoning step 1: focus on the context to the right of ``until")}\\
-\textbf{Context: }the universe obtained the temperatures required for the production of a quark-gluon plasma \textit{\textcolor{red}{as well as}} all other elementary particles. \\
-\textcolor{gray}{(reasoning step 2: focus on the context to the left of ``as well as")}\\
-\textbf{Answer: }until the universe obtained the temperatures required for the production of a quark-gluon plasma \\
+\textbf{Context: }\textit{\textcolor{red}{On}} 15 May, \textit{\textcolor{blue}{Nur ad-Din}} died \textit{\textcolor{red}{after}} falling ill the previous week \textit{\textcolor{red}{and}} his \textit{\textcolor{blue}{power}} was handed \textit{\textcolor{red}{to}} his eleven-year-old son as-Salih Ismail al-Malik. \\
+\textbf{Question1: }When did \textit{\textcolor{blue}{Nur ad-Din}} fall ill?     \\
+\textcolor{gray}{(reasoning steps: focus on the context (1) to the right of ``after", and (2) to the left of ``and")}\\
+\textbf{Answer: }falling ill the previous week \\
+\textbf{Question2: }Who was his \textit{\textcolor{blue}{power}} handed to?     \\
+\textcolor{gray}{(reasoning steps: focus on the context (1) to the right of ``and", and (2) to the right of ``to")}\\
+\textbf{Answer: }his eleven-year-old son as-Salih Ismail al-Malik \\
 \hline
     \end{tabular}
     }
@@ -31,7 +43,7 @@ By contrast, humans can answer questions following reasoning steps which are rep
 \vspace{-3ex}
 \end{figure}
 % \kechen{add a sentence for RL related work: RL nowadays can be used to analyze latent structure...?}
-To address these issues, we introduce a novel deep reasoning model for RC tasks, by taking advantage of the discourse information in the context. The model design is inspired by the reading behavior of a well trained reader (``mature reader"). A human reader would not search for the answer by simply reading the entire document without any focus. Instead he will look for the answer based on question topics and discourse markers ( \emph{e.g.} ``however" and ``because")~\cite{assiri2011test,sungatullina2016metacognitive}. Question topics and discourse markers can help the reader quickly select the most relevant segments (pieces of text) to read, and skip those less relevant ones. Figure \ref{fig:qa_example} gives an example on how a ``mature reader" finds an answer to a given question in a context paragraph. First, by reading the question, the reader notices the topic word ``reheating" and the question type ``when-". Then the reader searches for words that indicate \emph{time} from the given context, which could be ``after" or ``until". By analyzing the relationship between these time indicators and the target word ``reheating", the reader focuses on the context after ``until". Next, the reader splits the current focus by the connective ``as well as" into two clauses, which are complementary to each other. Finally, the reader picks the text segment between ``until" and ``as well as" as the final answer.
+To address these issues, we introduce a novel deep reasoning model for RC tasks, by taking advantage of the discourse information in the context. The model design is inspired by the reading behavior of a ``mature reader". Previous study shows that a human reader would not search for the answer by simply reading the entire document without any focus. Instead he will look for the answer based on question topics and discourse markers ( \emph{e.g.} ``however" and ``because")~\cite{assiri2011test,sungatullina2016metacognitive}. \kechen{People further build machine learning systems to answer ``How"- and ``Why"- questions with the help of discourse information \cite{DBLP:journals/ir/VerberneHTRB11,DBLP:conf/acl/JansenSC14,DBLP:conf/acl/NarasimhanB15}.} Question topics and discourse markers can help the reader quickly select the most relevant segments (pieces of text) to read, and skip those less relevant ones. Figure \ref{fig:qa_example} gives an example on how a ``mature reader" finds an answer to given questions in a context paragraph. First, by reading the question, the reader notices the topic word ``Nur ad-Din" and the question type ``when-". Then the reader searches for words that indicate \emph{time} from the given context, which is ``after". By analyzing the relationship between ``after" and the target word ``Nur ad-Din", the reader focuses on the context after ``after". Next, the reader splits the current focus by the connective ``and" into two clauses. Finally, the reader picks the text segment between ``after" and ``and" as the final answer. Similarly, the reader answer the second question based on different topic word and discourse indicators.
 
 %We observe a human reasoning behavior as a \kechen{multiple steps procedure to search for the correct answer based on the word marks in mind from the context related to the question}. This reasoning process can be guided by the question type first, then search the answer directed by the question topic.
 

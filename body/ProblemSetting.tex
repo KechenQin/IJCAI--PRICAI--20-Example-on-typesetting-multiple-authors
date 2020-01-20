@@ -22,7 +22,7 @@ contains the answer. The mechanic in reducing the text context is analogous to b
 (a) SGM encodes the context $C_t$ and question $Q$ into a vector representation, \emph{i.e.} the state $s_t$.\\
 (b) RGM takes the state $s_t$ as its input, and predicts the partition point $D^{p(s_t)}_t$ (${p(s_t)}$ is the index selected at \emph{t}) and the reading focus $f_t \in \{left, right\}$. An action is defined as $a_t=(D^{p(s_t)}_t,f_t)$. \\
 (c) CSO divides $C_t$ into two parts from $D^{p(s_t)}_t$: $C^1_t=(S^1, D^1,...,D^{p(s_t)-1}, S^{p(s_t)})$ and $C^2_t=(S^{p(s_t)+1}, D^{p(s_t)+1},...,D^k, S^{k+1})$, and keeps $C_{t+1} \leftarrow C_{t}^{1}$ if $f_t$ is left or $C_{t+1} \leftarrow C_{t}^{2}$ if $f_t$ is right. \\
-The iterations stop when the output only contains a single text segment enclosed by two neighbor discourse markers. Intermediate output $D^{p(s_t)}_t$ at each time-step constitutes a reasoning path $(D^{p(1)}_1,...,D^{p(s_t)}_t)$. We note that during the prediction procedure the context $C_t$ changes, while the question $Q$ not.
+The iterations stop when the output only contains a single text segment enclosed by two neighbor discourse markers. Intermediate output $D^{p(s_t)}_t$ at each time-step constitutes a reasoning path $(D^{p(1)}_1,...,D^{p(s_t)}_t)$. We note that during the prediction procedure the context $C_t$ changes, while the question $Q$ not. \kechen{The process is summarized in Algorithm \ref{alg:train_beam}.}
 
 % \emph{Remarks:}
 It is possible to add an answer extractor following the text segment $S'$ for a final answer (dashed in Figure \ref{fig:systemDiagram}). Since this is not our paper's focus and many existing works have been done achieve decent performance \cite{DBLP:conf/ijcai/HuPHQW018}, so this module is not discussed in this paper. %\cite{DBLP:conf/acl/WangYWCZ17,DBLP:journals/corr/abs-1804-09541,DBLP:conf/ijcai/HuPHQW018}. Since this is not our paper's focus, we do not discuss it here.\\
@@ -67,7 +67,7 @@ It is possible to add an answer extractor following the text segment $S'$ for a 
 \subsection{Deep Reinforcement Learning}\label{sec2intuition}
 %As described in the introduction, in order to build a "smart" machine comprehension system by imitating a human-like reasoning process, we leverage a deep reinforcement learning (DRL) based structure to infer the reasoning steps guided by the discourse markers and/or the target words. There are two main reasons to choose DRL as our fundamental model structure:\\
 
-We leverage a deep reinforcement learning (DRL) based structure to implement the reasoning generation module introduced in the above section. 
+We leverage a deep reinforcement learning (DRL) based structure to implement the system introduced in the above section. 
 For every given context-question pair, the dataset provides an answer. Although this answer can be used to evaluate the final output of any reasoning path, there is no ground truth to evaluate the performance of each intermediate reasoning step $D^{p(s_t)}_t$. There are usually several different reasoning paths leading to the correct answer segment, based on different sequences of selecting discourse markers; thus the  task of searching for the best path fits well into the reinforcement learning, as these actions can reasonably imitate the human actions.
 % , which makes our model more interpretable.
 % It enables a flexible number of action steps to gradually search for the correct answer instead of generating the answer from end-to-end.

@@ -1,6 +1,5 @@
 
 \textbf{Experimental Setup.}
- For all experiments we use 10\% training samples as the development set, and tune the parameters on it.
 We implement our deep reasoning model (DRM) using \textsc{tensorflow-1.4.0} and \textsc{Keras-2.0.8}. To implement CNNs, we use rectified linear units (relu) as activation functions and 300 convolutional filters with windows size of 2. We train the model with Adam optimizer with start learning rate $0.001$. We adopt \emph{accuracy} as our main evaluation metric, which measures how many selected text spans contain the answer out of all. The following  methods are compared:\\
 % \begin{itemize}
 % \vspace{-1mm}
@@ -8,7 +7,7 @@ We implement our deep reasoning model (DRM) using \textsc{tensorflow-1.4.0} and 
 $\bullet$ \textbf{DRM-type 1} and \textbf{DRM-type 2} Our deep reasoning models with type 1 /type 2 action. \\
 % $\bullet$  \textbf{DRM-type 2} Our deep reasoning model with type 2 action, as described in Section \ref{sec:design}. \\
 $\bullet$  \textbf{DRM-type 2 w/ human} We consider a variant of our deep reasoning model with human in the loop, in order to demonstrate that our model has the ability to interact with humans. At each decision step, if the algorithm's confidence in its best action is lower than a pre-specified threshold $T_r=0.6$, the algorithm asks a human to pick an action from the $2\times k$ actions. We assume that humans always make the right decision w.r.t. the ground truth.  \\
-$\bullet$  \textbf{DRM-noRL} We test our model structure (see Figure \ref{fig:sgmDiagram}) with multi-class classification loss. Each segment is assigned a score, and the segment with the highest score is predicted. \\
+$\bullet$  \textbf{DRM-noRL} We test our model structure with multi-class classification loss. Each segment is assigned a score, and the segment with the highest score is predicted. \\
  $\bullet$  \textbf{Gradient Boosting}. 
  % A  binary classifier to evaluate different (question, context segment) pairs and select the segment with the highest prediction score. corollary
 % Bag-of-words features are first extracted separately from both the question and the segment and then concatenated. We choose Gradient Boosting due to its effectiveness in modeling feature interactions;
@@ -21,118 +20,7 @@ $\bullet$  \textbf{RaSoR}~\cite{DBLP:journals/corr/LeeKP016} builds a deep neura
 
 \subsection{Experimental Results}
 %0. RL learning curve\\
-\begin{table*}[ht]
 
-	\begin{center}
-	\resizebox{1.95\columnwidth}{!}{%resize the table
-		\begin{tabular}{|l|c|c|c|c|cccccccc|}
-			\hline
-       \textbf{Method} & \textbf{Loss} & \textbf{Discourse} & \textbf{Target Word} 
-      & \textbf{All} & \textbf{What} & \textbf{Whose} & \textbf{How} & \textbf{Why} & \textbf{Where} & \textbf{Who} & \textbf{When} & \textbf{Which} \\
-
-            \hline
-      Gradient Boosting & binary & &
-      & .488 & .485 & .523 & .502 & .461 & .477 & .471 & .517 & .561 \\
-      Gradient Boosting & binary & \checkmark &\checkmark 
-      & .673 & .676 & .633 & .664 & .538 & .659 & .662 & .721 & .684 \\
-            Gradient Boosting & ranking & & 
-      & .469 & .486 & .397 & .414 & .566 & .475 & .447 & .453 & .457 \\
-      Gradient Boosting & ranking & \checkmark &\checkmark 
-      & .670 & .673 & .638 & .657 & .538 & .657 & .662 & .721 & .684 \\
-      BM25 & ranking & &
-      & .536 & .545 & .679 & .543 & .160 & .529 & .510 & .464 & .594 \\
-
-      Coarse-to-Fine Answer Selector & binary & &
-      & .540 & .539 & .490 & .506 & \textbf{.615} & .524 & .552 & .571 & .558 \\
-     % CNN & binary & &
-     % & .511 & .508 & .528 & .515 & .564 & .496 & .513 & .517 & .522 \\
-      RaSoR & multi-class & &
-      & .615 & .620 & \textbf{.706} & .598 & .560 & .599 & .598 & .586 & .659 \\
-      \hline
-      DRM-noRL & binary & \checkmark & \checkmark 
-       & .664 & .667 & .619 & .649 & .564 & .653 & .657 & .706 & .678 \\
-      DRM-type 1 & RL & \checkmark & 
-      & .691 & .696 & .676 & .681 & \textbf{.615} & .696 & .671 & .724 & .702 \\
-      DRM-type 2 & RL & \checkmark & \checkmark 
-      & \textbf{.702}  & \textbf{.703} & .676 & \textbf{.684} & \textbf{.615} & \textbf{.701} & \textbf{.677} & \textbf{.733} & \textbf{.705} \\
-      DRM-type 2 w/ human & RL & \checkmark & \checkmark 
-      & \textbf{.797} & \textbf{.801} & \textbf{.789} & \textbf{.769} & \textbf{.820} & \textbf{.778} & \textbf{.793} & \textbf{.815} & \textbf{.810} \\
-      \hline
-
-		\end{tabular}
-
-				}\vspace{0.4mm}	\\
-\small{Table 3(a): Results on QAMR-SUBSET dataset.}\\\vspace{2mm}
-	\resizebox{1.95\columnwidth}{!}{%resize the table
-		\begin{tabular}{|l|c|c|c|c|cccccccc|}
-			\hline
-       \textbf{Method} & \textbf{Loss} & \textbf{Discourse} & \textbf{Target Word} 
-      & \textbf{All} & \textbf{What} & \textbf{Whose} & \textbf{How} & \textbf{Why} & \textbf{Where} & \textbf{Who} & \textbf{When} & \textbf{Which} \\
-
-            \hline
-      Gradient Boosting & binary & &
-      & .338 & .355 & .363 & .289 & .166 & .291 & .311 & .263 & .428 \\
-      Gradient Boosting & binary & \checkmark &\checkmark 
-      & .575 & .586 & .528 & \textbf{.616} & .666 & .632 & \textbf{.621} & \textbf{.610} & \textbf{.528} \\
-            Gradient Boosting & ranking & & 
-      & .360 & .376 & .454 & .339 & .666 & .354 & .335 & .276 & .301 \\
-      Gradient Boosting & ranking & \checkmark &\checkmark 
-      & .561 & .567 & .424 & .578 & .166 & .583 & .566 & .539 & .507 \\
-      BM25 & ranking & &
-      & .456 & .481 & .380 & .393 & .0.0 & .448 & .439 & .444 & .491 \\
-
-      Coarse-to-Fine Answer Selector & binary & &
-      & .405 & .422 & .363 & .408 & .166 & .312 & .376 & .315 & .492 \\
-      %CNN & binary & &
-      %& .356 & .346 & .242 & .359 & .666 & .437 & .376 & .355 & .365 \\
-      RaSoR & multi-class & &
-      & .539 & .545 & \textbf{.619} & .525 & .375 & .528 & .552 & .487 & .491 \\
-      \hline
-      DRM-noRL & binary & \checkmark & \checkmark 
-       & .573 & .571 & .606 & .591 & .833 & \textbf{.645} & .572 & .513 & .539 \\
-      DRM-type 1 & RL & \checkmark & 
-      & .569 & .579 & .515 & .572 & \textbf{.833} & .625 & .560 & .513 & .492 \\
-      DRM-type 2 & RL & \checkmark & \checkmark 
-      & \textbf{.599} & \textbf{.599} & .575 & \textbf{.616} & \textbf{.833} & \textbf{.666} & .598 & .565 & .523 \\
-      DRM-type 2 w/ human & RL & \checkmark & \checkmark 
-      & \textbf{.676} & \textbf{.676} & \textbf{.727} & \textbf{.683} & \textbf{1.0} & .500 & \textbf{.698} & \textbf{.618} & \textbf{.682} \\
-      \hline
-    
-		\end{tabular}
-
-		}\vspace{0.4mm}	\\
-\small{Table 3(b): Results on PTB-SUBSET dataset.}\\\vspace{2mm}
-		
-	\resizebox{1.95\columnwidth}{!}{%resize the table
-		\begin{tabular}{|l|c|c|c|c|cccccccc|}
-			\hline
-       \textbf{Method} & \textbf{Loss} & \textbf{Discourse} & \textbf{Target Word} 
-      & \textbf{All} & \textbf{What} & \textbf{Whose} & \textbf{How} & \textbf{Why} & \textbf{Where} & \textbf{Who} & \textbf{When} & \textbf{Which} \\
-
-        \hline
-      Gradient Boosting & binary & &
-      & .224 & .231 & .303 & .150 & .500 & .458 & .210 & .197 & .158 \\
-      Gradient Boosting & binary & \checkmark &\checkmark 
-      & .352 & .346 & .393 & .379 & .500 & .361 & .329 & .394 & .400 \\
-      Coarse-to-Fine Answer Selector & binary & &
-      & .367  & .369 & .272 & .402 & .333 & .250 & .358 & .473 & .317 \\
-      RaSoR & multi-class & &
-      & .590 & \textbf{.610} & \textbf{.714} & .512 & .500 & .586 & .547 & \textbf{.581} & \textbf{.711} \\
-      DRM-type 2 & RL & \checkmark & \checkmark 
-      & \textbf{.596} & .601 & .515 & \textbf{.616} & \textbf{.833} & \textbf{.625} & \textbf{.592} & .565 & .507 \\
-     % DRM-type 2\_ptb
-     % & .599 & .599 & .575 & .616 & .833 & .666 & .598 & .565 & .523 \\
-      \hline
-
-		\end{tabular}
-
-		}\vspace{0.4mm}			\\
-\small{Table 3(c): Transfer test results on PTB-SUBSET dataset.}\\\vspace{2mm}
-	\end{center}
-	\caption{Comparison of different approaches. We show the training loss (binary: binary cross entropy loss, ranking: ranking loss, multi-class: cross entropy loss, RL: reinforcement learning loss in formula \ref{rlloss}.), and check whether discourse or target word is used in each method. We highlight the top scores of each column in bold. 
-  }\label{tab:main}
-  \vspace{-3ex}
-\end{table*}
 
 
 
@@ -165,7 +53,7 @@ In this section, we compare our model with several other benchmark QA models on 
 \end{tabular}
 }
 \caption{\fontsize{10}{12}\selectfont  Our model vs. popular QA models.}\label{tab:nnresults}
-  \vspace{-3ex}
+  \vspace{-2ex}
 \end{table}
 Most of these approaches are originally designed to extract the exact answer(s) from the context. In order to modify these models' outputs as a segment, we change the training target from the exact answer to an answer segment. We observe that QANet gives the best accuracy in terms of selecting the correct text span containing the answer. 
 % All these methods except QANet can be considered as multi-step reasoning models, and our model gives the best performance among all these models.
@@ -231,3 +119,14 @@ Most of these approaches are originally designed to extract the exact answer(s) 
 
 Our method has an obvious advantage over the others: unlike the multi-step models where the number of steps need to be predefined, our model is capable of using a dynamic number of reasoning steps to resolve different QA pairs. Another very important difference is that the existing models achieve multi-step by updating the internal vector representations, which is not interpretable, while our model directly prunes the context for an interpretable reasoning process.
 
+\subsection{Experiment on SQuAD}
+
+\begin{figure}
+ \centering
+ \includegraphics[width=0.9\linewidth]{fig/squad.png}
+ \caption{Accuracy on each discourse marker interval of SQuAD dataset. We show the number of documents in each interval on top of each bar.}
+ \label{fig:squad}
+\vspace{-2ex}
+\end{figure}
+
+\kechen{can we say small \#dm is equivalent to short context} We next experiment our method on one SQuAD dataset. To show the performance on different context size, we group documents into buckets based on the number of discourse markers they contain, and report the model performance of each bucket. Experimental results show that the performance on short context (\emph{e.g.} $<$5 discourse markers) is comparable to state-of-the-art single BERT model \cite{DBLP:journals/corr/abs-1810-04805}, but the performance drop a lot when the number of discourse markers increase. We think excessive number of discourse markers in long document tends to give redundant reasoning steps. Binary searching by discourse markers in such long documents is not necessarily how human read and interpret long expositions, so our method is less applicable. In long context scenarios, we suppose one can use coarse-to-fine strategy to pinpoint the answer in a relatively short span, and then apply our approach to infer the reasoning path and the answer. 

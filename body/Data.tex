@@ -3,7 +3,7 @@
 %\kechen{highlight importance of using discourse marker, one sentence may contain more than one answer candidate, which makes NN model hard to distinguish.}
 \textbf{Discourse Markers Lexicon.}
 %In Rhetorical Structure Theory (RST) discourse framework \cite{mann1988rhetorical}, the text is segmented into a sequence of non-overlapping fragments called elementary discourse units (EDUs), and discourse relations connect neighboring units. Both EDUs and discourse relations, encoding the useful information about syntactic and semantic pragmatic properties, play important roles in understanding the context structure and extracting answers given a query \cite{DBLP:conf/clin/Bosma04,bosma2005extending,DBLP:journals/tal/VerberneBCO06,DBLP:conf/acl/JansenSC14,DBLP:conf/acl/NarasimhanB15}. Because discourse analysis is notoriously difficult, existing work seeks to utilize discourse markers to determine discourse relations, and thus identify the EDUs \cite{adequacyusing,sporleder2007exploiting,}. In this work, discourse markers guide the model to distinguish the answer-relevant text segments or EDUs from the context. \kechen{rewrite}
-To build a lexicon of English discourse markers, we collect connectives from Penn Discourse Treebank 2.0 (PDTB2.0) \cite{DBLP:conf/lrec/PrasadDLMRJW08} and \cite{marcu1998rhetorical}'s list of cue phrases. Inspired by a recent work \cite{DBLP:conf/sigdial/DasSBS18}, we add to our list additional words from RST Signalling Corpus \cite{das2014rst}, DiMLex-Eng corpus \cite{DBLP:conf/sigdial/DasSBS18}, and \cite{DBLP:journals/ijsc/BiranR11}'s relational indicators. After filtering out discourse markers with low frequencies in our corpora, we get a list of 207 discourse markers. Table \ref{tab:discourse_markers} shows sample discourse markers with their senses\footnote{Although in most of the cases the discourse markers can separate arguments with different meanings, some of the discourse markers such as ``although'' and ``if'' can precede both arguments, \textit{e.g.``although her friends like ice cream, she prefers yogurt''.} To deal with these cases, we add ``,'' into our sets of discourse markers to help.}. 
+To build a lexicon of English discourse markers, we collect connectives from Penn Discourse Treebank 2.0 (PDTB2.0) \cite{DBLP:conf/lrec/PrasadDLMRJW08} and \cite{marcu1998rhetorical}'s list of cue phrases. Inspired by a recent work \cite{DBLP:conf/sigdial/DasSBS18}, we add to our list additional words from RST Signalling Corpus \cite{das2014rst}, DiMLex-Eng corpus \cite{DBLP:conf/sigdial/DasSBS18}, and \cite{DBLP:journals/ijsc/BiranR11}'s relational indicators. After filtering out discourse markers with low frequencies in our corpora, we get a list of 207 discourse markers. Table \ref{tab:discourse_markers} shows sample discourse markers with their senses.%\footnote{Although in most of the cases the discourse markers can separate arguments with different meanings, some of the discourse markers such as ``although'' and ``if'' can precede both arguments, \textit{e.g.``although her friends like ice cream, she prefers yogurt''.} To deal with these cases, we add ``,'' into our sets of discourse markers to help.}. 
 \begin{table}[t]
 \centering
 {
@@ -33,11 +33,123 @@ To build a lexicon of English discourse markers, we collect connectives from Pen
 \vspace{-2ex}
 \end{table}
 
+\begin{table*}[t]
+
+	\begin{center}
+	\resizebox{1.85\columnwidth}{!}{%resize the table
+		\begin{tabular}{|l|c|c|c|c|cccccccc|}
+			\hline
+       \textbf{Method} & \textbf{Loss} & \textbf{Discourse} & \textbf{Target Word} 
+      & \textbf{All} & \textbf{What} & \textbf{Whose} & \textbf{How} & \textbf{Why} & \textbf{Where} & \textbf{Who} & \textbf{When} & \textbf{Which} \\
+
+            \hline
+      Gradient Boosting & binary & &
+      & .488 & .485 & .523 & .502 & .461 & .477 & .471 & .517 & .561 \\
+      Gradient Boosting & binary & \checkmark &\checkmark 
+      & .673 & .676 & .633 & .664 & .538 & .659 & .662 & .721 & .684 \\
+            Gradient Boosting & ranking & & 
+      & .469 & .486 & .397 & .414 & .566 & .475 & .447 & .453 & .457 \\
+      Gradient Boosting & ranking & \checkmark &\checkmark 
+      & .670 & .673 & .638 & .657 & .538 & .657 & .662 & .721 & .684 \\
+      BM25 & ranking & &
+      & .536 & .545 & .679 & .543 & .160 & .529 & .510 & .464 & .594 \\
+
+      Coarse-to-Fine Answer Selector & binary & &
+      & .540 & .539 & .490 & .506 & \textbf{.615} & .524 & .552 & .571 & .558 \\
+     % CNN & binary & &
+     % & .511 & .508 & .528 & .515 & .564 & .496 & .513 & .517 & .522 \\
+      RaSoR & multi-class & &
+      & .615 & .620 & \textbf{.706} & .598 & .560 & .599 & .598 & .586 & .659 \\
+      \hline
+      DRM-noRL & binary & \checkmark & \checkmark 
+       & .664 & .667 & .619 & .649 & .564 & .653 & .657 & .706 & .678 \\
+      DRM-type 1 & RL & \checkmark & 
+      & .691 & .696 & .676 & .681 & \textbf{.615} & .696 & .671 & .724 & .702 \\
+      DRM-type 2 & RL & \checkmark & \checkmark 
+      & \textbf{.702}  & \textbf{.703} & .676 & \textbf{.684} & \textbf{.615} & \textbf{.701} & \textbf{.677} & \textbf{.733} & \textbf{.705} \\
+      DRM-type 2 w/ human & RL & \checkmark & \checkmark 
+      & \textbf{.797} & \textbf{.801} & \textbf{.789} & \textbf{.769} & \textbf{.820} & \textbf{.778} & \textbf{.793} & \textbf{.815} & \textbf{.810} \\
+      \hline
+
+		\end{tabular}
+
+				}\vspace{0.4mm}	\\
+\small{Table \ref{tab:main}(a): Results on QAMR-SUBSET dataset.}\\\vspace{2mm}
+	\resizebox{1.85\columnwidth}{!}{%resize the table
+		\begin{tabular}{|l|c|c|c|c|cccccccc|}
+			\hline
+       \textbf{Method} & \textbf{Loss} & \textbf{Discourse} & \textbf{Target Word} 
+      & \textbf{All} & \textbf{What} & \textbf{Whose} & \textbf{How} & \textbf{Why} & \textbf{Where} & \textbf{Who} & \textbf{When} & \textbf{Which} \\
+
+            \hline
+      Gradient Boosting & binary & &
+      & .338 & .355 & .363 & .289 & .166 & .291 & .311 & .263 & .428 \\
+      Gradient Boosting & binary & \checkmark &\checkmark 
+      & .575 & .586 & .528 & \textbf{.616} & .666 & .632 & \textbf{.621} & \textbf{.610} & \textbf{.528} \\
+            Gradient Boosting & ranking & & 
+      & .360 & .376 & .454 & .339 & .666 & .354 & .335 & .276 & .301 \\
+      Gradient Boosting & ranking & \checkmark &\checkmark 
+      & .561 & .567 & .424 & .578 & .166 & .583 & .566 & .539 & .507 \\
+      BM25 & ranking & &
+      & .456 & .481 & .380 & .393 & .0.0 & .448 & .439 & .444 & .491 \\
+
+      Coarse-to-Fine Answer Selector & binary & &
+      & .405 & .422 & .363 & .408 & .166 & .312 & .376 & .315 & .492 \\
+      %CNN & binary & &
+      %& .356 & .346 & .242 & .359 & .666 & .437 & .376 & .355 & .365 \\
+      RaSoR & multi-class & &
+      & .539 & .545 & \textbf{.619} & .525 & .375 & .528 & .552 & .487 & .491 \\
+      \hline
+      DRM-noRL & binary & \checkmark & \checkmark 
+       & .573 & .571 & .606 & .591 & .833 & \textbf{.645} & .572 & .513 & .539 \\
+      DRM-type 1 & RL & \checkmark & 
+      & .569 & .579 & .515 & .572 & \textbf{.833} & .625 & .560 & .513 & .492 \\
+      DRM-type 2 & RL & \checkmark & \checkmark 
+      & \textbf{.599} & \textbf{.599} & .575 & \textbf{.616} & \textbf{.833} & \textbf{.666} & .598 & .565 & .523 \\
+      DRM-type 2 w/ human & RL & \checkmark & \checkmark 
+      & \textbf{.676} & \textbf{.676} & \textbf{.727} & \textbf{.683} & \textbf{1.0} & .500 & \textbf{.698} & \textbf{.618} & \textbf{.682} \\
+      \hline
+    
+		\end{tabular}
+
+		}\vspace{0.4mm}	\\
+\small{Table \ref{tab:main}(b): Results on PTB-SUBSET dataset.}\\\vspace{2mm}
+		
+	\resizebox{1.85\columnwidth}{!}{%resize the table
+		\begin{tabular}{|l|c|c|c|c|cccccccc|}
+			\hline
+       \textbf{Method} & \textbf{Loss} & \textbf{Discourse} & \textbf{Target Word} 
+      & \textbf{All} & \textbf{What} & \textbf{Whose} & \textbf{How} & \textbf{Why} & \textbf{Where} & \textbf{Who} & \textbf{When} & \textbf{Which} \\
+
+        \hline
+      Gradient Boosting & binary & &
+      & .224 & .231 & .303 & .150 & .500 & .458 & .210 & .197 & .158 \\
+      Gradient Boosting & binary & \checkmark &\checkmark 
+      & .352 & .346 & .393 & .379 & .500 & .361 & .329 & .394 & .400 \\
+      Coarse-to-Fine Answer Selector & binary & &
+      & .367  & .369 & .272 & .402 & .333 & .250 & .358 & .473 & .317 \\
+      RaSoR & multi-class & &
+      & .590 & \textbf{.610} & \textbf{.714} & .512 & .500 & .586 & .547 & \textbf{.581} & \textbf{.711} \\
+      DRM-type 2 & RL & \checkmark & \checkmark 
+      & \textbf{.596} & .601 & .515 & \textbf{.616} & \textbf{.833} & \textbf{.625} & \textbf{.592} & .565 & .507 \\
+     % DRM-type 2\_ptb
+     % & .599 & .599 & .575 & .616 & .833 & .666 & .598 & .565 & .523 \\
+      \hline
+
+		\end{tabular}
+
+		}\vspace{0.4mm}			\\
+\small{Table \ref{tab:main}(c): Transfer test results on PTB-SUBSET dataset.}\\\vspace{2mm}
+	\end{center}
+	\caption{Comparison of different approaches. We show the training loss (binary: binary cross entropy loss, ranking: ranking loss, multi-class: cross entropy loss, RL: reinforcement learning loss in formula \ref{rlloss}.), and check whether discourse or target word is used in each method. We highlight the top scores of each column in bold. 
+  }\label{tab:main}
+  \vspace{-3ex}
+\end{table*}
+
 \textbf{RC Corpora.}
-There are many QA datasets (\textit{e.g.} SQuAD \cite{DBLP:conf/emnlp/RajpurkarZLL16,DBLP:conf/acl/RajpurkarJL18} and CNN/Daily
-News \cite{DBLP:conf/nips/HermannKGEKSB15}) available for reading comprehension tasks. Most of the documents in these datasets, however, don't contain dense discourse markers, thus they are not suitable to test our model's performance. 
+%There are many QA datasets (\textit{e.g.} SQuAD \cite{DBLP:conf/emnlp/RajpurkarZLL16,DBLP:conf/acl/RajpurkarJL18} and CNN/Daily News \cite{DBLP:conf/nips/HermannKGEKSB15}) available for reading comprehension tasks. Most of the documents in these datasets, however, don't contain dense discourse markers, thus they are not suitable to test our model's performance. 
 %Although deep neural networks perform well on these datasets, they fail to explain long path reasoning. 
-To demonstrate our model, we focus on Question-Answer meaning representations datasets \cite{DBLP:conf/naacl/MichaelSHDZ18}: the QAMR corpus and the PTB corpus. Both of them contain relative short-document context but with complex logic reasoning steps. Specifically, the Wall Street Journal (WSJ) documents in PTB corpus are widely used in discourse studies. We restrict our discussion to shorter documents by filtering out documents without discourse markers and those with more than 10 discourse markers; this is because an excessive number of discourse markers in long document tends to give redundant reasoning steps. Binary searching by discourse markers in such long documents is not necessarily how human read and interpret long expositions, so our method is less applicable.
+To demonstrate our model, we first experiment on Question-Answer meaning representations datasets \cite{DBLP:conf/naacl/MichaelSHDZ18}: the QAMR corpus and the PTB corpus. Both of them contain relative short-document context but with complex logic reasoning steps. 
 % , which is also kind of different from a normal human's reading behavior. Removing such samples can also helps us reduce the total training time.
 %This study uses two corpora from Question-Answer Meaning Representations datasets \cite{DBLP:conf/naacl/MichaelSHDZ18}: the QAMR corpus and the PTB corpus. They contain QA pairs extracted from Wikipedia and Penn Treebank \cite{DBLP:journals/coling/MarcusSM94}.
 %The QAMR corpus consists of 69,320 QA pairs for 4,238 context paragraphs extracted from Wikipedia, and the PTB corpus consists of 27,082 QA pairs for 253 context paragraphs extracted from Penn Treebank \cite{DBLP:journals/coling/MarcusSM94}.
@@ -45,5 +157,7 @@ There is one target word in each question representing the question topic associ
 When the answer spreads across two text segments, we treat the discourse segment containing more than 50\% answer tokens as the answer segment.
 %We assume that the answer cannot spread across two text segments, and remove those counter-cases (Only 8\% QA pairs are counter-cases.), so each context only contains one segment 
 % enclosed by discourse markers containing the ground truth answer. 
-After pre-processing, 5\% QA pairs are filtered out from the original dataset, and the two corpora in our experiments are referred as \textsc{QAMR-SUBSET} and \textsc{PTB-SUBSET}.
+5\% QA pairs are filtered out from the original dataset because they contain zero  or excessive number of discourse markers, and the two corpora in our experiments are referred as \textsc{QAMR-SUBSET} and \textsc{PTB-SUBSET}. The average number of segments and words per segment are 4.7/5.7 and 4.4/6.0 for each dataset.
 % These two datasets are suitable to our reading comprehension experiments and transferable experiments, as they contain a variety of questions that are from different sources.
+
+%We restrict our discussion to shorter documents by filtering out documents without discourse markers and those with more than 10 discourse markers; this is because an excessive number of discourse markers in long document tends to give redundant reasoning steps. Binary searching by discourse markers in such long documents is not necessarily how human read and interpret long expositions, so our method is less applicable.

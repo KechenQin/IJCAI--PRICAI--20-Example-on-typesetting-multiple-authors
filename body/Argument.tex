@@ -1,7 +1,8 @@
 
 
 
-\section{Reasoning with Discourse Markers}
+\section{\kechen{Interpretable} Reasoning with Discourse Markers}
+\kechen{highlight this section is used to show interpretability?}
 We inspect the trained model and find the discourse markers which have the greatest impact for each question type. Our model tends to rely on different discourse markers in different reasoning steps. In Table~\ref{tab:disc_phrase}, we show the discourse markers used in the first two reasoning steps. As we can see, the discourse markers used in the first step are quite tailored to the question type while those in the second step are only loosely related. This shows that our model can navigate to the most relevant discourse marker very quickly, typically within one step. Next we analyze how the model chooses the focus to move based on discourse markers and the location of the target word for type 2 action. From the second to the fourth columns in Table~\ref{tab:disc_phrase} show which direction we should move to at each discourse marker. For instance, to answer a ``why'' question, if the current discourse marker we are looking at is ``due to'', then the model expects the target word and the explanation part (the answer we are looking for) to appear on opposite sides of the marker, which matches our intuition (\textit{i.e.} \textit{target word} due to \textit{answer}). The fourth column shows some discourse markers depend on context to select side to focus.
 
 

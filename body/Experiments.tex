@@ -33,16 +33,17 @@ Among the baseline methods, Gradient Boosting trained on both bag-of-words + dis
 % The classical BM25 works well on questions that start with ``whose" but terribly on questions that start with ``why". 
 Since BM25 solely relies on similarity between the question and the segment, it only works well when the the question and the correct segment have many overlapping words, as in the case of ``whose" questions, but not ``why" questions.
 
-We also study whether the learned reasoning model is transferable by training DRM on the QAMR dataset but test the learned model on PTB dataset. Results in Table~\ref{tab:main} show that this model generalizes well on PTB dataset -- its performance is very close to the DRM model trained on PTB directly. We also observe that the RaSoR model achieves a very good performance. We think this is because training a deep neural network model benefits from the larger number of training samples in QAMR-SUBSET dataset. 
+We also study whether the learned reasoning model is transferable by training DRM on the QAMR dataset but test the learned model on PTB dataset. Results in Table~\ref{tab:main} show that this model generalizes well on PTB dataset -- its performance is very close to the DRM model trained on PTB directly. We also observe that the RaSoR model achieves a very good performance. We think this is because training a deep neural network model benefits from the larger number of training samples in QAMR dataset. 
 
 
 \subsection{Comparison with QA Methods}
-In this section, we compare our model with several other benchmark QA models on the QAMR-SUBSET and PTB-SUBSET datasets. The results are shown in Table~\ref{tab:nnresults}. 
+In this section, we compare our model with several other benchmark QA models on the QAMR and PTB datasets. The results are shown in Table~\ref{tab:nnresults}. 
 \begin{table}[h]
-	\resizebox{1.01\columnwidth}{!}{%resize the table
+	\centering
+	\resizebox{0.8\columnwidth}{!}{%resize the table
 \begin{tabular}{|l|c|c|}
   \hline
-  \textsc{Model} & \textsc{QAMR-SUBSET} & \textsc{PTB-SUBSET}   \\
+  \textsc{Model} & \textsc{QAMR} & \textsc{PTB}   \\
   \hline
   MemNets & .476 & .423 \\
   GA-Reader (fix $L(w)$) & .610 & .532 \\
@@ -112,7 +113,7 @@ Most of these approaches are originally designed to extract the exact answer(s) 
  \hline
 \end{tabular}
 }
-\caption{\fontsize{9}{12}\selectfont Top discourse markers are associated with question genres, and focus direction is learned in \textsc{QAMR-SUBSET} dataset. We show four different question genres: time, reason, person, and location.}
+\caption{\fontsize{9}{12}\selectfont Top discourse markers are associated with question genres, and focus direction is learned in \textsc{QAMR} dataset. We show four different question genres: time, reason, person, and location.}
 \label{tab:disc_phrase}
 \vspace{-3ex}
 \end{table*}
@@ -129,4 +130,4 @@ Our method has an obvious advantage over the others: unlike the multi-step model
 \vspace{-2ex}
 \end{figure}
 
-\kechen{can we say small \#dm indicates short context} We next experiment our method on the SQuAD dataset. To show the performance on different context size, we group documents into buckets based on the number of discourse markers they contain, and report the model performance of each bucket. Experimental results show that the performance on short context (\emph{e.g.} $<$5 discourse markers) is comparable to state-of-the-art single BERT model \cite{DBLP:journals/corr/abs-1810-04805}, but the performance drop a lot when the number of discourse markers increase. We think excessive number of discourse markers in long document tends to give redundant reasoning steps. Binary searching by discourse markers in such long documents is not necessarily how human read and interpret long expositions, so our method is less applicable. In long context scenarios, we suppose one can use coarse-to-fine strategy to pinpoint the answer in a relatively short span, and then apply our approach to infer the reasoning path and the answer. 
+\kechen{1. can we say small \#dm indicates short context  2.bert on squad solve a harder task, how do we compare our result with them.} We next experiment our method on the SQuAD dataset. To show the performance on different context size, we group documents into buckets based on the number of discourse markers they contain, and report the model performance of each bucket. Experimental results show that the performance on short context (\emph{e.g.} $<$5 discourse markers) is comparable to state-of-the-art single BERT model \cite{DBLP:journals/corr/abs-1810-04805}, but the performance drop a lot when the number of discourse markers increase. We think excessive number of discourse markers in long document tends to give redundant reasoning steps. Binary searching by discourse markers in such long documents is not necessarily how human read and interpret long expositions, so our method is less applicable. In long context scenarios, we suppose one can use coarse-to-fine strategy to pinpoint the answer in a relatively short span, and then apply our approach to infer the reasoning path and the answer. To verify our speculation, we simulate coarse-to-fine step by selecting a short text span around the labeled answer. The extracted text spans contain 5.7 discourse markers in average and serve as new context. We then apply our model on it to predict the answer segment. Experimental results show that the overall accuracy on whole SQuAD dev dataset is 0.82. This new result is much better than it on original dataset and comparable to STOA result. 

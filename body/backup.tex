@@ -340,3 +340,5 @@ We consider the following variants of our method:
 \end{minipage}
 \vspace{-2ex}
 \end{figure}
+
+To verify our speculation, we simulate coarse-to-fine step by selecting a short text span around the labeled answer. The extracted text spans contain 5.7 discourse markers in average and serve as new context. We then apply our model on it to predict the answer segment. Experimental results show that the overall accuracy on whole SQuAD dev dataset is 0.82. This new result is much better than it on original dataset and comparable to STOA result. 

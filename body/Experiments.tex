@@ -24,16 +24,16 @@ $\bullet$  \textbf{RaSoR}~\cite{DBLP:journals/corr/LeeKP016} builds a deep neura
 
 
 
-We report the overall segment prediction accuracy on the datasets and the accuracy on each question type (Table~\ref{tab:main}). On both QAMR dataset and PTB dataset, DRM-type 2 with human in the loop achieves the highest accuracy. Being able to interact with humans is an advantage of our approach; 
+We report the overall segment prediction accuracy on the datasets and the accuracy on each question type (Table~\ref{tab:main}). On both QAMR and PTB datasets, DRM-type 2 with human in the loop achieves the highest accuracy. Being able to interact with humans is an advantage of our approach; 
 % Humans can understand the decision process of the algorithm and can intervene if necessary. By contrast, 
 none of the competitor approaches can do this, either because their decision process is a single-step process or because their decision process is not interpretable. In our experiment, 65\% QA pairs (less than the threshold) get help from human at one reasoning step, and their performance increases 0.15. It is also very interesting to learn that the remaining 35\% data points with high confidence reasoning learned by our model perform 0.06 better than the average performance. To further understand whether the improvement comes from human's selection or from our model's judgement, we allow the model to randomly select 65\% of the QA pairs, and for each pair, to interact with human once without considering their confidence. The results show that such random selection procedure doesn't make any difference on performance. Even without human's help, our DRM-type 2 model still achieves better performance than all other methods. As expected, DRM-type 2 model performs better than DRM-type 1 model, since type 2 actions leverage more information. 
 %Looking at how the algorithm performs as the number of reasoning steps increases, the prediction accuracy increases slightly as the reasoning gets longer: the accuracy for 1-step, 2-step, 3-step and 4-step reasoning is 0.700,0.700,0.705 and 0.727.
 
-Among the baseline methods, Gradient Boosting trained on both bag-of-words + discourse features works best. These models perform much worse if trained only on bag-of-words features. This shows that the structure/order information captured by discourse features is essential, which Neural network doesn't do. 
+Among the baseline methods, Gradient Boosting trained on both bag-of-words + discourse features works best. These models perform much worse if trained only on bag-of-words features. This shows that the structure/order information captured by discourse features is essential.
 % The classical BM25 works well on questions that start with ``whose" but terribly on questions that start with ``why". 
 Since BM25 solely relies on similarity between the question and the segment, it only works well when the the question and the correct segment have many overlapping words, as in the case of ``whose" questions, but not ``why" questions.
 
-We also study whether the learned reasoning model is transferable by training DRM on the QAMR dataset but test the learned model on PTB dataset. Results in Table~\ref{tab:main} show that this model generalizes well on PTB dataset -- its performance is very close to the DRM model trained on PTB directly. We also observe that the RaSoR model achieves a very good performance. We think this is because training a deep neural network model benefits from the larger number of training samples in QAMR dataset. 
+We ask whether the DRM reasoning model trained on QAMR dataset is transferable on PTB dataset. Results in Table~\ref{tab:main} show that this model indeed generalizes well on PTB dataset -- its performance is very close to the DRM model trained on PTB directly. We also observe that the RaSoR model achieves a very good performance, perhaps because training a deep neural network model benefits from the larger number of training samples in QAMR dataset. 
 
 
 \subsection{Comparison with QA Methods}
@@ -125,7 +125,7 @@ Our method has an obvious advantage over the others: unlike the multi-step model
 \begin{figure}
  \centering
  \includegraphics[width=0.9\linewidth]{fig/squad.png}
- \caption{\kechen{Accuracy on each discourse marker interval of SQuAD dataset, which contains 10,570 documents. We show the number of documents in each interval on top of each bar.}}
+ \caption{Accuracy on each discourse marker group of SQuAD dataset, which contains 10,570 documents. We show the number of documents in each group on top of each bar.}
  \label{fig:squad}
 \vspace{-2ex}
 \end{figure}

@@ -132,7 +132,7 @@ Our method has an obvious advantage over the others: unlike the multi-step model
 
 % \kechen{1. can we say small \#dm indicates short context  2.bert on squad solve a harder task, how do we compare our result with them. 3.do we mention long context doesnt work because of repeating discourse markers}
 
-We next experiment our method on the SQuAD dataset~\cite{squad_paper}, which is popular for tasks like reasoning comprehension. We do not think our method works on long-context (i.e. many discourse markers), so we group documents based on the number of discourse markers they contain, and report the model performance of each group (Fig~\ref{fig:squad}). We clearly see  that performance on short context (\emph{e.g.} $<$5 discourse markers) is comparable to state-of-the-art single BERT model \cite{DBLP:journals/corr/abs-1810-04805} which achieves 0.87 accuracy on exact match task. 
+We next experiment our method on the SQuAD dataset~\cite{DBLP:conf/emnlp/RajpurkarZLL16}, which is popular for tasks like reasoning comprehension. We do not think our method works on long-context (i.e. many discourse markers), so we group documents based on the number of discourse markers they contain, and report the model performance of each group (shown in Fig~\ref{fig:squad}). We clearly see  that performance on short context (\emph{e.g.} $<$5 discourse markers) is comparable to state-of-the-art single BERT model \cite{DBLP:journals/corr/abs-1810-04805} which achieves 0.87 accuracy in terms of exact match. 
 
 However the performance drops when the number of discourse markers increase, as 
 % We think excessive number of discourse markers in long document tends to give redundant reasoning steps. 
